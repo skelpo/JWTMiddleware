@@ -74,6 +74,15 @@
         }
       },
       {
+        "package": "JWTVapor",
+        "repositoryURL": "https://github.com/skelpo/JWTVapor.git",
+        "state": {
+          "branch": null,
+          "revision": "7f0adabec9edb65aecf190645fc4a19c4074c6c2",
+          "version": "0.6.1"
+        }
+      },
+      {
         "package": "Multipart",
         "repositoryURL": "https://github.com/vapor/multipart.git",
         "state": {
