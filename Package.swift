@@ -15,7 +15,7 @@ let package = Package(
     ],
     targets: [
         .target(name: "JWTAuthenticatable", dependencies: ["Vapor", "Authentication", "JWTVapor", "VaporRequestStorage"]),
-        .target(name: "JWTMiddleware", dependencies: ["Vapor", "Authentication", "JWTVapor"]),
+        .target(name: "JWTMiddleware", dependencies: ["Vapor", "Authentication", "JWTVapor", "JWTAuthenticatable"]),
         .testTarget(name: "JWTMiddlewareTests", dependencies: ["JWTMiddleware"])
     ]
 )

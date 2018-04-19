@@ -7,7 +7,7 @@ Handles authentication and authorization of models through JWT tokens by themsel
 Add this line to your manifest's `dependencies` array:
 
 ```swift
-.package(url: "https://github.com/skelpo/JWTMiddleware.git", from: "0.2.0")
+.package(url: "https://github.com/skelpo/JWTMiddleware.git", from: "0.2.1")
 ```
 
 And add `JWTMiddleware` to all the target dependency arrays you want to access the package in.
