@@ -3,7 +3,7 @@
 import Vapor
 import JWT
 
-/// Gets a JWT payload from a request and stores it for later.
+/// Gets a JWT payload from a request, validates it, and stores it for later.
 public final class JWTVerificationMiddleware<Payload: JWTPayload>: Middleware {
     
     // We create this empty init because the

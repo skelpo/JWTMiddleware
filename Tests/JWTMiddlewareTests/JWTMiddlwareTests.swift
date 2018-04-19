@@ -1,7 +1,7 @@
 import XCTest
-@testable import JWTMiddlware
+@testable import JWTMiddleware
 
-final class JWTMiddlwareTests: XCTestCase {
+final class JWTMiddlewareTests: XCTestCase {
     func testExample() {}
     
     static var allTests = [
