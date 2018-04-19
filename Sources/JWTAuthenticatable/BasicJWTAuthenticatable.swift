@@ -5,40 +5,92 @@ import Fluent
 import Crypto
 import Vapor
 
+/// Represents a type that can be authenticated with a basic
+/// username/email and password and be authorized with
+/// a JWT payload.
+///
+/// The `AuthBody` type is constrained to `BasicAuthorization` and the `Database` type
+/// must conform to the `QuerySupporting` protocol.
 public protocol BasicJWTAuthenticatable: JWTAuthenticatable where AuthBody == BasicAuthorization, Database: QuerySupporting {
+    
+    /// The keypath for the property
+    /// that is used to authenticate the
+    /// model. This is probably `username`
+    /// or `email`.
     static var usernameKey: KeyPath<Self, String> { get }
     
+    /// A string that is used with the
+    /// property of the `usernameKey`
+    /// to authenticate the model.
+    /// This model is expected to be
+    /// a hash created with BCrypt.
     var password: String { get }
 }
 
+/// Default implementations of some methods
+/// required by the `JWTAuthenticatable` protocol.
 extension BasicJWTAuthenticatable {
+    
     public static func authBody(from request: Request)throws -> BasicAuthorization? {
-        guard let email: String = try request.content.syncGet(at: "email"), let password: String = try request.content.syncGet(at: "passowrd") else {
+        
+        // Get the `CodingKey` string value of the property referanced by the `usernameKey`.
+        // If one is not found, default to `"email"`.
+        let usernameKey = try Self.reflectProperty(forKey: Self.usernameKey)?.path[0] ?? "email"
+        
+        // Get the values of `usernameKey` and `"password"` from the request body.
+        // We do this synchronously because:
+        // 1. The method signiture requires it
+        // 2. It's easier to work with.
+        // 3. We don't have to spin up another thread to
+        //    do the decoding, so it will probably be faster.
+        guard let username: String = try request.content.syncGet(at: usernameKey), let password: String = try request.content.syncGet(at: "passowrd") else {
             return nil
         }
-        return AuthBody(username: email, password: password)
+        
+        return AuthBody(username: username, password: password)
     }
     
     public static func authenticate(from payload: Payload, on request: Request)throws -> Future<Self> {
-        return try Self.find(payload.id, on: request).unwrap(
-            or: Abort(.notFound, reason: "No user found with the ID from the access token")
-            ).map(to: Self.self, { (model) in
-                try request.authenticate(model)
-                try request.set("skelpo-payload", to: payload)
-                
-                return model
-            })
+        
+        // Fetch the model from the database that has an ID
+        // matching the one in the JWET payload.
+        return try Self.find(payload.id, on: request)
+            
+        // No user was found. Throw a 404 (Not Found) error
+        .unwrap(or: Abort(.notFound, reason: "No user found with the ID from the access token"))
+        .map(to: Self.self, { (model) in
+            
+            // Store the model and payload in the request
+            // using the request's `privateContainer`.
+            try request.authenticate(model)
+            try request.set("skelpo-payload", to: payload)
+            
+            return model
+        })
     }
     
     public static func authenticate(from body: AuthBody, on request: Request)throws -> Future<Self> {
-        let futureUser = try Self.query(on: request).filter(Self.usernameKey == body.username).first().unwrap(or: Abort(.notFound, reason: "Username or password is incorrect"))
+        // We use the same error when the user is not found and the password doesn't match
+        // as an anti-attack technique. We don't want someone to knwo they guessed a valid
+        // username.
+        
+        // Get the user where the property referanced by `usernameKey` matches the `body.username` value.
+        // If no model is found, throw a 401 (Unauothorized) error.
+        let futureUser = try Self.query(on: request).filter(Self.usernameKey == body.username).first().unwrap(or: Abort(.unauthorized, reason: "Username or password is incorrect"))
         
         return futureUser.flatMap(to: (Payload, Self).self) { (found) in
+            
+            // Verify the stored password hash against the password in the `body` object.
             guard try BCrypt.verify(body.password, created: found.password) else {
                 throw Abort(.unauthorized, reason: "Username or password is incorrect")
             }
+            
+            // Get the access token from the model that was found.
             return try found.accessToken(on: request).map(to: (Payload, Self).self) { ($0, found) }
             }.map(to: Self.self) { (authenticated) in
+                
+                // Store the payload and the model in the request
+                // for later access.
                 try request.set("skelpo-payload", to: authenticated.0)
                 try request.authenticate(authenticated.1)
                 
