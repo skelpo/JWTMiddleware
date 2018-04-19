@@ -1,5 +1,5 @@
-import VaporRequestStorage
-import JWTVapor
+@_exported import VaporRequestStorage
+@_exported import JWTVapor
 import Vapor
 import JWT
 
