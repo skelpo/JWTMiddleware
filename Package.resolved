@@ -182,6 +182,15 @@
         }
       },
       {
+        "package": "VaporRequestStorage",
+        "repositoryURL": "https://github.com/skelpo/vapor-request-storage.git",
+        "state": {
+          "branch": null,
+          "revision": "4235043ed27f2a55ccf186e7402321697d154e16",
+          "version": "0.1.0"
+        }
+      },
+      {
         "package": "WebSocket",
         "repositoryURL": "https://github.com/vapor/websocket.git",
         "state": {
