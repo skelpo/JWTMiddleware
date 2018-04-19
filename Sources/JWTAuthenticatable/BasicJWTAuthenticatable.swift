@@ -12,7 +12,7 @@ public protocol BasicJWTAuthenticatable: JWTAuthenticatable where AuthBody == Ba
 }
 
 extension BasicJWTAuthenticatable {
-    public static func authBody(from request: Request)throws -> AuthBody? {
+    public static func authBody(from request: Request)throws -> BasicAuthorization? {
         guard let email: String = try request.content.syncGet(at: "email"), let password: String = try request.content.syncGet(at: "passowrd") else {
             return nil
         }
