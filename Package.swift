@@ -13,7 +13,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/jwt.git", from: "3.0.0-rc")
     ],
     targets: [
+        .target(name: "JWTAuthenticatable", dependencies: ["Vapor", "Authentication", "JWT"]),
         .target(name: "JWTMiddlware", dependencies: ["Vapor", "Authentication", "JWT"]),
-        .testTarget(name: "JWTMiddlwareTests", dependencies: ["JWTMiddlware"]),
+        .testTarget(name: "JWTMiddlwareTests", dependencies: ["JWTMiddlware"])
     ]
 )
