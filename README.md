@@ -83,3 +83,9 @@ The JWTAuthenticatable module exports the following types:
 	- `associatedtype Payload: IdentifiableJWTPayload`: A type that the payload of a JWT token can be converted to. This type is used to authorize requests.
 	- `usernameKey: KeyPath<Self, String>`: The key-path for the property that will be checked against the `body.username` value during authentication. This will usually be either an email or username. This property can be either a variable or constant.
 	- `var password: String` The hashed password of the model, used to verify the request'c credibility. This properties value _must_ be hash using BCrypt.
+
+This module also adds some helper methods to the `Request` type:
+
+- `accessToken()throws -> String`: Gets the value of the `Authorization: Bearer ...` header.
+- `payload<Payload: Decodable>(as payloadType: Payload.Type = Payload.self)throws -> Payload`: Gets the payload of a JWT token the was previously stored in the request by a middleware.
+- `payloadData<Payload, Object>(storedAs stored: Payload.Type, convertedTo objectType: Object.Type = Object.self)throws -> Object`: Gets the payload of a JWT token stored in the request and converts it to a different type.
