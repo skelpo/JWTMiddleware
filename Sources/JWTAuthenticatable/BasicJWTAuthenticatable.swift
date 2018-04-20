@@ -53,7 +53,7 @@ extension BasicJWTAuthenticatable {
     public static func authenticate(from payload: Payload, on request: Request)throws -> Future<Self> {
         
         // Fetch the model from the database that has an ID
-        // matching the one in the JWET payload.
+        // matching the one in the JWT payload.
         return try Self.find(payload.id, on: request)
             
         // No user was found. Throw a 404 (Not Found) error
