@@ -14,30 +14,72 @@ And add `JWTMiddleware` to all the target dependency arrays you want to access t
 
 Complete the installation by running `vapor update` or `swift package update`.
 
-## Middleware
+## Modules
 
-**`JWTAuthenticatableMiddlware`**
+There are currently 2 modules in the JWTMiddleware package; `JWTMiddleware` and `JWTAuthenticatable`.
 
-Handles authenticating/authorizing a model conforming to `JWTAuthenticatable` using data pulled from a request.
+The `JWTMiddleware` module contains middleware for request authentication/authorization and helpers for getting data stored in the request by the middleware.
 
-```swift
-route.group(JWTAuthenticatableMiddlware<User>())
-```
+The `JWTAuthenticatable` module holds protocols that allow a type to be authenticated/authorized in the middleware declared in the `JWTMiddleware` module.
 
----
+## JWTMiddleware
 
-**`JWTVerificationMiddleware`**
+The JWTMiddleware module exports the following types:
 
-Gets a JWT payload from a request, validates it, and stores it for later.
+- `JWTAuthenticatableMiddlware`:
 
-```swift
-route.group(JWTVerificationMiddleware<UserPayload>())
-```
+	Handles authenticating/authorizing a model conforming to `JWTAuthenticatable` using data pulled from a request. 
+	
+	When a request is passed though the middleware, it will first check to see if the specified model is already authenticated. If it is not, it will try to get data to authenticate the model by calling the static `authBody(from:)` method. If it successfully authenticates, it will get the model's access token by calling `accessToken(on:)`, then store both the token and the authenticated model in the request for accessing later. If `nil` is return from `authBody(from:)`, then we try to authenticate using data from the `Authorization: Bearer ...` header. If authentication succeeds, we will store both the token fetched from the header and the authenticated model in the request.
+	
+	You can register the middleware to a route group as shown below.
+	
+	```swift
+	let auth = route.group(JWTAuthenticatableMiddlware<User>())
+	```
 
-## Protocols
+- `JWTVerificationMiddleware`:
 
-See source doc comments for details.
+	 Gets the value from the `Authorization: Bearer ...` header, verifies it with the specified payload type, and stores it in the request for later.
+	
+	```swift
+	route.group(JWTVerificationMiddleware<UserPayload>())
+	```
 
-- `IdentifiableJWTPayload`
-- `JWTAuthenticatable`
-- `BasicJWTAuthenticatable`
+## JWTAuthenticatable
+
+The JWTAuthenticatable module exports the following types:
+
+- `IdentifiableJWTPayload`:
+	
+	Represents a JWT payload with an `id` value. This is used by the `BasicJWTAuthenticatable` to access a model from the database based on its `id` property.
+	
+- `JWTAuthenticatable`:
+	
+	A model that can be authorized with a JWT payload and authenticated with an unspecified type that is defined by the implementing type.
+	
+	This protocol requires the following types/properties/methods:
+	
+	- `associatedtype AuthBody`: Used for authentication of the model.
+	- `associatedtype Payload: IdentifiableJWTPayload`: A type that the payload of a JWT token can be converted to. This type is used to authorize requests.
+	
+	- `accessToken(on request: Request) throws -> Future<Payload>`: This method should create a payload for a JWT token that will later be used to authorize the model.
+	- `static authBody(from request: Request)throws -> AuthBody?`: Gets data from a request that can be used to authenticate a model
+	- `static authenticate(from payload: Payload, on request: Request)throws -> Future<Self>`: Verifies the payload passed in and gets an instance of the model based on the payload's contents.
+	- `static authenticate(from body: AuthBody, on request: Request)throws -> Future<Self>`: Gets a model and checks it against the contents of the `body` parameter passed in.
+
+- `BasicJWTAuthenticatable`:
+
+	Implements `JWTAuthenticatable` methods for authenticating with an id/password combination. The ID should either be a username or email.
+	
+	The `authBody` method implementation gets the name of the property referenced by the `usernameKey` key-path. It will then extract the values from the request body with the key from `usernameKey` and `"password"`.
+	
+	The payload authorization method simply finds the instance of the model stored in the database with an ID equal to the `id` property in the payload.
+	
+	The `AuthBody` authentication method fetches the first user from the database with a `usernameKey` property equal to the `body.username` value. It then checks to see if the model's password hash is equal to the `body.password` value, using BCrypt verification.
+	
+	This protocols requires the following type/properties:
+	
+	- `associatedtype Payload: IdentifiableJWTPayload`: A type that the payload of a JWT token can be converted to. This type is used to authorize requests.
+	- `usernameKey: KeyPath<Self, String>`: The key-path for the property that will be checked against the `body.username` value during authentication. This will usually be either an email or username. This property can be either a variable or constant.
+	- `var password: String` The hashed password of the model, used to verify the request'c credibility. This properties value _must_ be hash using BCrypt.
