@@ -75,7 +75,7 @@ public protocol JWTAuthenticatable: Authenticatable, Content where Payload.ID ==
     ///
     /// - Returns: A future value of the model that was fetched.
     /// - Throws: Whatever the implementation throws.
-    static func authenticate(from body: AuthBody, on reques: Request)throws -> Future<Self>
+    static func authenticate(from body: AuthBody, on request: Request)throws -> Future<Self>
 }
 
 

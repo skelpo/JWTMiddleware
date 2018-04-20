@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "JWTMiddleware",
     products: [
-        .library(name: "JWTMiddleware", targets: ["JWTMiddleware"]),
+        .library(name: "JWTMiddleware", targets: ["JWTMiddleware", "JWTAuthenticatable"]),
     ],
     dependencies: [
         .package(url: "https://github.com/skelpo/vapor-request-storage.git", from: "0.1.0"),

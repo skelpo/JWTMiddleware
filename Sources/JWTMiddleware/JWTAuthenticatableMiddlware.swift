@@ -1,4 +1,4 @@
-import JWTAuthenticatable
+@_exported import JWTAuthenticatable
 import JWTVapor
 import Fluent
 import Crypto
