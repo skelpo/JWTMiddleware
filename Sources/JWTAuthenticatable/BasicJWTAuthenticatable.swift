@@ -43,7 +43,7 @@ extension BasicJWTAuthenticatable {
         // 2. It's easier to work with.
         // 3. We don't have to spin up another thread to
         //    do the decoding, so it will probably be faster.
-        guard let username: String = try request.content.syncGet(at: usernameKey), let password: String = try request.content.syncGet(at: "passowrd") else {
+        guard let username: String = try request.content.syncGet(at: usernameKey), let password: String = try request.content.syncGet(at: "password") else {
             return nil
         }
         
