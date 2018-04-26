@@ -5,6 +5,41 @@ import Fluent
 import Crypto
 import Vapor
 
+/// Used to decode a request body in
+/// `BasicJWTAuthenticatable.authBody(from:)`.
+///
+/// This type is generic so we can access the property
+/// name of the `usernameKey` as the `username` deocding string value.
+struct UsernamePassword<Model: BasicJWTAuthenticatable>: Codable {
+    
+    /// The `username` value for creating
+    /// a `BasicAuthorization` instance.
+    let username: String?
+    
+    /// The `password` value for creating
+    /// a `BasicAuthorization` instance.
+    let password: String?
+    
+    /// The keys used to decode a request
+    /// body to this struct type.
+    enum CodingKeys: CodingKey {
+        
+        /// The decoding key for the `password` property.
+        case password
+        
+        /// The decoding key for the `username` property.
+        case username
+        
+        /// See `CodingKey.stringValue`.
+        var stringValue: String {
+            switch self {
+            case .password: return "password"
+            case .username: return (try? Model.reflectProperty(forKey: Model.usernameKey)?.path[0] ?? "email") ?? "email"
+            }
+        }
+    }
+}
+
 /// Represents a type that can be authenticated with a basic
 /// username/email and password and be authorized with
 /// a JWT payload.
@@ -31,23 +66,15 @@ public protocol BasicJWTAuthenticatable: JWTAuthenticatable where AuthBody == Ba
 /// required by the `JWTAuthenticatable` protocol.
 extension BasicJWTAuthenticatable {
     
-    public static func authBody(from request: Request)throws -> BasicAuthorization? {
+    public static func authBody(from request: Request)throws -> Future<BasicAuthorization?> {
         
-        // Get the `CodingKey` string value of the property referanced by the `usernameKey`.
-        // If one is not found, default to `"email"`.
-        let usernameKey = try Self.reflectProperty(forKey: Self.usernameKey)?.path[0] ?? "email"
-        
-        // Get the values of `usernameKey` and `"password"` from the request body.
-        // We do this synchronously because:
-        // 1. The method signiture requires it
-        // 2. It's easier to work with.
-        // 3. We don't have to spin up another thread to
-        //    do the decoding, so it will probably be faster.
-        guard let username: String = try request.content.syncGet(at: usernameKey), let password: String = try request.content.syncGet(at: "password") else {
-            return nil
+        // Get the request body as a `UsernamePassword` instance and convert it to a `BasicAuthorization` instance.
+        return try request.content.decode(UsernamePassword<Self>.self).map(to: AuthBody?.self) { authData in
+            guard let password = authData.password, let username = authData.username else {
+                return nil
+            }
+            return AuthBody(username: username, password: password)
         }
-        
-        return AuthBody(username: username, password: password)
     }
     
     public static func authenticate(from payload: Payload, on request: Request)throws -> Future<Self> {

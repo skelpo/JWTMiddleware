@@ -46,10 +46,10 @@ public protocol JWTAuthenticatable: Authenticatable, Content where Payload.ID ==
     /// - Parameter request: The request for the route where the body
     ///   will be fetched to use in.
     ///
-    /// - Returns: The authentication data. `nil` if the data does not
+    /// - Returns: The authentication data wrapped in a future. `nil` if the data does not
     ///  exist in the request.
     /// - Throws: Whatever throws in the implementation.
-    static func authBody(from request: Request)throws -> AuthBody?
+    static func authBody(from request: Request)throws -> Future<AuthBody?>
     
     /// Verifies the payload passed in, then fetches the
     /// correct user bassed on the payloads information.
