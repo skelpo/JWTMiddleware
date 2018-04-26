@@ -68,6 +68,11 @@ extension BasicJWTAuthenticatable {
     
     public static func authBody(from request: Request)throws -> Future<BasicAuthorization?> {
         
+        // We can't decode the body if there isn't one, so let's return `nil` before we try and fail.
+        if request.http.method.hasRequestBody == .no || request.http.method.hasRequestBody == .unlikely {
+            return request.eventLoop.newSucceededFuture(result: nil)
+        }
+        
         // Get the request body as a `UsernamePassword` instance and convert it to a `BasicAuthorization` instance.
         return try request.content.decode(UsernamePassword<Self>.self).map(to: AuthBody?.self) { authData in
             guard let password = authData.password, let username = authData.username else {
