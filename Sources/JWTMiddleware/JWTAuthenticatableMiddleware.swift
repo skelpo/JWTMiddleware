@@ -7,7 +7,7 @@ import JWT
 
 /// Handles authenticating/authorizing a model conforming to `JWTAuthenticatable`
 /// using data pulled from a request.
-public final class JWTAuthenticatableMiddlware<A: JWTAuthenticatable>: Middleware {
+public final class JWTAuthenticatableMiddleware<A: JWTAuthenticatable>: Middleware {
     
     // We create this empty init because the
     // synthesized init is marked `internal`.
