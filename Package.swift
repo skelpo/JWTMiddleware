@@ -8,9 +8,9 @@ let package = Package(
         .library(name: "JWTMiddleware", targets: ["JWTMiddleware", "JWTAuthenticatable"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/skelpo/vapor-request-storage.git", from: "0.1.0"),
-        .package(url: "https://github.com/skelpo/JWTVapor.git", from: "0.6.1"),
-        .package(url: "https://github.com/vapor/vapor.git", from: "3.0.0-rc"),
+        .package(url: "https://github.com/skelpo/vapor-request-storage.git", from: "0.3.0"),
+        .package(url: "https://github.com/skelpo/JWTVapor.git", from: "0.9.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "3.0.0"),
         .package(url: "https://github.com/vapor/auth.git", from: "2.0.0-rc")
     ],
     targets: [
