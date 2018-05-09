@@ -17,7 +17,7 @@ public protocol IdentifiableJWTPayload: JWTPayload {
 
 /// A type that can be authenticated with some type and authorized with a JWT payload.
 /// The `Payload.ID` type must be equal to the model's `ID` type.
-public protocol JWTAuthenticatable: Authenticatable, Content where Payload.ID == Self.ID {
+public protocol JWTAuthenticatable: Model, Authenticatable, Content where Payload.ID == Self.ID {
     
     /// The type that the model can
     /// be authenticated with.

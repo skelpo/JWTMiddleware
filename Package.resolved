@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/vapor/auth.git",
         "state": {
           "branch": null,
-          "revision": "c88227ea542c2a2b699d8f5b9f44531248902584",
-          "version": "2.0.0-rc.3.1"
+          "revision": "c8594a4026924483d3906e7cebf5084ae83efcbf",
+          "version": "2.0.0-rc.4"
         }
       },
       {
@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/vapor/url-encoded-form.git",
         "state": {
           "branch": null,
-          "revision": "8448fa943057c01220f6a940d3b1b8e9fd92a96e",
-          "version": "1.0.2"
+          "revision": "57cf7fb9c1a1014c50bc05123684a9139ad44127",
+          "version": "1.0.3"
         }
       },
       {
@@ -186,8 +186,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "821184be792dfa144a82fe379784e04eb9dad1eb",
-          "version": "3.0.1"
+          "revision": "8c73eebf7c41c7d8bf83ff87f550e0f97d6aadc4",
+          "version": "3.0.2"
         }
       },
       {
@@ -204,8 +204,8 @@
         "repositoryURL": "https://github.com/vapor/websocket.git",
         "state": {
           "branch": null,
-          "revision": "23acd21aa37a200faa2f5d5525c974efa6b5676c",
-          "version": "1.0.0"
+          "revision": "141cb4d3814dc8062cb0b2f43e72801b5dfcf272",
+          "version": "1.0.1"
         }
       }
     ]
