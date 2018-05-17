@@ -59,19 +59,16 @@ public final class RouteRestrictionMiddleware<Status, Payload, Authed>: Middlewa
     /// pass for the request to validated.
     public let restrictions: [RouteRestriction<Status>]
     
-    /// THe status code to throw if no
-    /// restriction passes.
+    /// The status code to throw if no restriction passes.
     public let failureError: HTTPStatus
     
-    /// Parameters types that can be used in
-    /// a route path.
+    /// Parameters types that can be used in a route path.
     public let parameters: [String: (String, Container)throws -> Any]
     
-    /// Creates a middleware instance with restrictions and an HTTP status to throw
-    /// if they all fail on a request.
+    /// Creates a new `RouteRestrictionMiddleware`.
     ///
     /// - Parameters:
-    ///   - restrioctions: An array the `RouteRestrictions` to verify each incoming
+    ///   - restrictions: An array the `RouteRestrictions` to verify each incoming
     ///     request against.
     ///   - failureError: The HTTP status to throw if all restrictions fail. The default
     ///     value is `.notFound` (404). `.unauthorized` (401) would be another common option.
@@ -151,6 +148,19 @@ public final class RouteRestrictionMiddleware<Status, Payload, Authed>: Middlewa
         return try next.respond(to: request)
     }
     
+    /// Compares an array of path component cases to a URI's path components,
+    /// resolving whether the URI would be valid for a route with the given components.
+    ///
+    /// - Parameters:
+    ///   - components: The `PathComponent` cases to check against
+    ///     the URI path components.
+    ///   - path: The URI path components. If the `URL.pathComponents` property
+    ///     is used for this value, drop the leading forward slash before passing it in.
+    ///   - The parameter types that appear in `components` array. If there are none, an
+    ///     empty dictionary can be passed in. A single entry is `<TYPE>.routingSlug: <TYPE>.resolveParameter`.
+    ///   - container: The container used to run the paramter resolving functions. This will probably be a request.
+    ///
+    /// - Returns: `true` if the components and path are equivalent. `false` if they are not.
     public func compare(components: [PathComponent], to path: [String], parameters: [String: (String, Container)throws -> Any], on container: Container)throws -> Bool {
         
         // Zip the arrays togeather so we can check each
@@ -183,6 +193,17 @@ public final class RouteRestrictionMiddleware<Status, Payload, Authed>: Middlewa
         return true
     }
     
+    /// Gets the IDs of a model type from a URI's path components
+    /// by comparing them to an array of `PathComponent` cases, along
+    /// with the uthenticated model's ID.
+    ///
+    /// - Parameters:
+    ///   - path: The path components to extract the IDs from.
+    ///   - matching: The `PathComponent` cases that represent
+    ///     the `path` parameter passed in.
+    ///   - The parent model type for the IDs that are being extracted.
+    ///
+    /// - Returns: All the `Parent.ID` instances that appear in the path passed in.
     public func authedIDs<Parent>(from request: Request, matching path: [String], and components: [PathComponent], for userType: Parent.Type = Parent.self)throws -> [Parent.ID]
         where Parent: Model & Parameter & Authenticatable, Parent.ID: LosslessStringConvertible
     {
@@ -196,6 +217,16 @@ public final class RouteRestrictionMiddleware<Status, Payload, Authed>: Middlewa
         return ids
     }
     
+    /// Gets the IDs of a model type from a URI's path components
+    /// by comparing them to an array of `PathComponent` cases.
+    ///
+    /// - Parameters:
+    ///   - path: The path components to extract the IDs from.
+    ///   - matching: The `PathComponent` cases that represent
+    ///     the `path` parameter passed in.
+    ///   - The parent model type for the IDs that are being extracted.
+    ///
+    /// - Returns: All the `Parent.ID` instances that appear in the path passed in.
     public func ids<Parent>(from path: [String], matching: [PathComponent], for userType: Parent.Type = Parent.self)throws -> [Parent.ID]
         where Parent: Model & Parameter, Parent.ID: LosslessStringConvertible
     {
