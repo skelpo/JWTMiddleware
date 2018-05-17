@@ -49,7 +49,7 @@ public struct RouteRestriction<Status> where Status: Equatable {
     }
 }
 
-/// Verfies incoming request's againts `RouteRestriction` instances.
+/// Verifies incoming request's againts `RouteRestriction` constraints.
 public final class RouteRestrictionMiddleware<Status, Payload, Authed>: Middleware
     where Authed: Authenticatable & Model & Parameter, Payload: PermissionedUserPayload, Status == Payload.Status, Authed.ID: LosslessStringConvertible, Authed.ID == Payload.ID
 {
