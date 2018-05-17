@@ -45,6 +45,35 @@ The JWTMiddleware module exports the following types:
 	```swift
 	route.group(JWTVerificationMiddleware<UserPayload>())
 	```
+- `RouteRestrictionMiddleware`:
+
+   Restricts access to routes based on a user's permission level (i.e. Admin, Moderator, Standard, etc.)
+   
+   ```swift
+   route.group(RouteRestrictionMiddleware(
+   		restrictions: [
+   			RouteRestriction(.DELETE, at: "users", User.parameter, allowed: [.admin, .moderator]),
+   			...
+   		],
+   		parameters: [User.routingSlug: User.resolveParameter]
+   ))
+   ```
+  
+   You must add custom parameter types used due to the way the request's URI and the restrictions path components are checked. Default parameter types are added by default.
+   
+   If a user is authenticated via middleware before `RouteRestrictionMiddleware`, the middleware will use that user's ID to check against the ID in the JWT payload we checking a request.
+   
+- `RouteRestriction`:
+
+   A restriction constraint for a `RouteRestrictionMiddleware` instance. The initializer takes in an optional method, a path, and valid permission levels for that path. If the method is `nil`, any method for the given path will be restricted.
+   
+   ```swift
+   RouteRestriction(.GET, at: "dashboard", "user", User.parameter, "tickets", allowed: [.admin])
+   ```
+
+- `PermissionedUserPayload`: 
+
+   Extends `IdentifiableJWTPayload` adding a 
 
 ## JWTAuthenticatable
 
