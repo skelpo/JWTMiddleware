@@ -235,18 +235,18 @@ public final class RouteRestrictionMiddleware<Status, Payload, Authed>: Middlewa
         return try zip(path, matching).compactMap { components -> (slug: String, element: String)? in
             guard case let PathComponent.parameter(slug) = components.1 else { return nil }
             return (slug, components.0)
+        }
+        
+        // Filter out parameters for the `Parent` model.
+        .filter { $0.slug == Parent.routingSlug }
+        
+        // Get the `Parent` IDs from the parameter value
+        // passed in through the URL.
+        .map { parameter in
+            guard let id = Parent.ID.init(parameter.element) else {
+                throw Abort(.badRequest, reason: "Unable to create \(String(describing: Parent.self)) ID from parameter '\(parameter.element)'")
             }
-            
-            // Filter out parameters for the `Parent` model.
-            .filter { $0.slug == Parent.routingSlug }
-            
-            // Get the `Parent` IDs from the paramneter value
-            // passed in through the URL.
-            .map { parameter in
-                guard let id = Parent.ID.init(parameter.element) else {
-                    throw Abort(.badRequest, reason: "Unable to create \(String(describing: Parent.self)) ID from parameter '\(parameter.element)'")
-                }
-                return id
+            return id
         }
     }
 }
