@@ -46,7 +46,7 @@ struct UsernamePassword<Model: BasicJWTAuthenticatable>: Codable {
 ///
 /// The `AuthBody` type is constrained to `BasicAuthorization` and the `Database` type
 /// must conform to the `QuerySupporting` protocol.
-public protocol BasicJWTAuthenticatable: JWTAuthenticatable where AuthBody == BasicAuthorization, Database: QuerySupporting {
+public protocol BasicJWTAuthenticatable: JWTAuthenticatable where AuthBody == BasicAuthorization {
     
     /// The keypath for the property
     /// that is used to authenticate the
@@ -86,7 +86,7 @@ extension BasicJWTAuthenticatable {
         
         // Fetch the model from the database that has an ID
         // matching the one in the JWT payload.
-        return try Self.find(payload.id, on: request)
+        return Self.find(payload.id, on: request)
             
         // No user was found. Throw a 404 (Not Found) error
         .unwrap(or: Abort(.notFound, reason: "No user found with the ID from the access token"))
@@ -108,7 +108,7 @@ extension BasicJWTAuthenticatable {
         
         // Get the user where the property referanced by `usernameKey` matches the `body.username` value.
         // If no model is found, throw a 401 (Unauothorized) error.
-        let futureUser = try Self.query(on: request).filter(Self.usernameKey == body.username).first().unwrap(or: Abort(.unauthorized, reason: "Username or password is incorrect"))
+        let futureUser = Self.query(on: request).filter(Self.usernameKey == body.username).first().unwrap(or: Abort(.unauthorized, reason: "Username or password is incorrect"))
         
         return futureUser.flatMap(to: (Payload, Self).self) { (found) in
             
