@@ -15,14 +15,27 @@ public final class JWTStorageMiddleware<Payload: JWTPayload>: Middleware {
     /// See `Middleware.respond(to:chainingTo:)`.
     public func respond(to request: Request, chainingTo next: Responder) throws -> Future<Response> {
         
-        // 1. Get the payload from the request
-        // 2. Store the payload in the request
+        // 1. Get the JWT from the request
+        // 2. Verify the JWT
+        // 3. Store the payload in the request
         //    for easier access.
-        // 3. Fire the next responder.
+        // 4. Fire the next responder.
         
-        let payload: Payload = try request.payload()
+        // Extract the token from the request. It is expected to
+        // be in the `Authorization` header as a bearer: `Bearer ...`
+        guard let token = request.http.headers.bearerAuthorization?.token else {
+            throw Abort(.badRequest, reason: "'Authorization' header with bearer token is missing")
+        }
         
+        // Get JWT service to verify the token with
+        let jwt = try request.make(JWTService.self)
+        let data = Data(token.utf8)
+        
+        // Verify to token and store the payload in the request's private container.
+        let payload = try JWT<Payload>(from: data, verifiedUsing: jwt.signer).payload
         try request.set("skelpo-payload", to: payload)
+        
+        // Fire the next responder in the chain.
         return try next.respond(to: request)
     }
 }
