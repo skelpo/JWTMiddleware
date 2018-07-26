@@ -15,7 +15,7 @@ public final class JWTAuthenticatableMiddleware<A: JWTAuthenticatable>: Middlewa
     /// Creates an instance of the middleware
     public init() {}
     
-    /// See Middleware.respond(to:chainingTo:).
+    /// See `Middleware.respond(to:chainingTo:)`.
     public func respond(to request: Request, chainingTo next: Responder) throws -> Future<Response> {
         
         // If the model is already quthenticated,

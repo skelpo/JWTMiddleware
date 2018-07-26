@@ -12,7 +12,7 @@ public final class JWTStorageMiddleware<Payload: JWTPayload>: Middleware {
     /// Creates an instance of the middleware
     public init() {}
     
-    /// See Middleware.respond(to:chainingTo:).
+    /// See `Middleware.respond(to:chainingTo:)`.
     public func respond(to request: Request, chainingTo next: Responder) throws -> Future<Response> {
         
         // 1. Get the payload from the request
@@ -37,7 +37,7 @@ public final class JWTVerificationMiddleware: Middleware {
     /// Creates an instance of the middleware
     public init() {}
     
-    /// See Middleware.respond(to:chainingTo:).
+    /// See `Middleware.respond(to:chainingTo:)`.
     public func respond(to request: Request, chainingTo next: Responder) throws -> Future<Response> {
         
         // Extract the token from the request. It is expected to
