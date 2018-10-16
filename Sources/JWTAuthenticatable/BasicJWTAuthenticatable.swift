@@ -52,7 +52,7 @@ public protocol BasicJWTAuthenticatable: JWTAuthenticatable where AuthBody == Ba
     /// that is used to authenticate the
     /// model. This is probably `username`
     /// or `email`.
-    static var usernameKey: KeyPath<Self, String> { get }
+    static var usernameKey: WritableKeyPath<Self, String> { get }
     
     /// A string that is used with the
     /// property of the `usernameKey`
