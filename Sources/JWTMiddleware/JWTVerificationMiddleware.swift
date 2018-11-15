@@ -24,7 +24,7 @@ public final class JWTStorageMiddleware<Payload: JWTPayload>: Middleware {
         // Extract the token from the request. It is expected to
         // be in the `Authorization` header as a bearer: `Bearer ...`
         guard let token = request.http.headers.bearerAuthorization?.token else {
-            throw Abort(.badRequest, reason: "'Authorization' header with bearer token is missing")
+            throw Abort(.unauthorized, reason: "'Authorization' header with bearer token is missing")
         }
         
         // Get JWT service to verify the token with
@@ -56,7 +56,7 @@ public final class JWTVerificationMiddleware: Middleware {
         // Extract the token from the request. It is expected to
         // be in the `Authorization` header as a bearer: `Bearer ...`
         guard let token = request.http.headers.bearerAuthorization?.token else {
-            throw Abort(.badRequest, reason: "'Authorization' header with bearer token is missing")
+            throw Abort(.unauthorized, reason: "'Authorization' header with bearer token is missing")
         }
         
         // Get JWT service to verify the token with
