@@ -18,12 +18,12 @@ public protocol PermissionedUserPayload: IdentifiableJWTPayload {
 
 /// Verifies incoming request's authentication payload status
 /// against pre-defined allowed statuses.
-public final class PermissionsMiddleware<Status, Payload>: Middleware where Payload: PermissionedUserPayload, Status == Payload.Status {
+public final class PermissionsMiddleware<Payload>: Middleware where Payload: PermissionedUserPayload {
     
     /// All the restrictions to check against the
     /// incoming request. Only one restriction must
     /// pass for the request to validated.
-    public let statuses: [Status]
+    public let statuses: [Payload.Status]
     
     /// The status code to throw if no restriction passes.
     public let failureError: HTTPStatus
@@ -34,7 +34,7 @@ public final class PermissionsMiddleware<Status, Payload>: Middleware where Payl
     ///   - statuses: An array of valid permission statuses.
     ///   - failureError: The HTTP status to throw if all restrictions fail. The default
     ///     value is `.notFound` (404). `.unauthorized` (401) would be another common option.
-    public init(allowed statuses: [Status], failureError: HTTPStatus = .notFound) {
+    public init(allowed statuses: [Payload.Status], failureError: HTTPStatus = .notFound) {
         self.statuses = statuses
         self.failureError = failureError
     }
