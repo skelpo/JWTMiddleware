@@ -33,7 +33,7 @@ public final class JWTStorageMiddleware<Payload: JWTPayload>: Middleware {
         
         // Verify to token and store the payload in the request's private container.
         let payload = try JWT<Payload>(from: data, verifiedUsing: jwt.signer).payload
-        try request.set("skelpo-payload", to: payload)
+        try request.set(.payloadKey, to: payload)
         
         // Fire the next responder in the chain.
         return try next.respond(to: request)

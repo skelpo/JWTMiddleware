@@ -27,7 +27,7 @@ extension Request {
     ///   request storage. This is because this method should _only_ be called
     ///   if a JWT compatible model has been authenticated through a `JWTMiddleware`.
     public func payload<Payload: Decodable>(as payloadType: Payload.Type = Payload.self)throws -> Payload {
-        guard let payload = try self.get("skelpo-payload", as: Payload .self) else {
+        guard let payload = try self.get(.payloadKey, as: Payload .self) else {
             throw Abort(.internalServerError, reason: "No JWTMiddleware has been registered for the current route.")
         }
         return payload
@@ -46,7 +46,7 @@ extension Request {
     ///   or some other error from encoding and decoding the payload.
     public func payloadData<Payload, Object>(storedAs stored: Payload.Type, convertedTo objectType: Object.Type = Object.self)throws -> Object
         where Payload: Encodable, Object: Decodable {
-            guard let payload = try self.get("skelpo-payload", as: Payload.self) else {
+            guard let payload = try self.get(.payloadKey, as: Payload.self) else {
                 throw Abort(.internalServerError, reason: "No JWTMiddleware has been registered for the current route.")
             }
             
