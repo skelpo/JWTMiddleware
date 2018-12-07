@@ -5,6 +5,12 @@ import Fluent
 import Crypto
 import Vapor
 
+extension String {
+    
+    /// The key for the JWT payload when it is stored in a Vapor `Request` object.
+    public static let payloadKey: String = "skelpo-payload"
+}
+
 /// Used to decode a request body in
 /// `BasicJWTAuthenticatable.authBody(from:)`.
 ///
@@ -95,7 +101,7 @@ extension BasicJWTAuthenticatable {
             // Store the model and payload in the request
             // using the request's `privateContainer`.
             try request.authenticate(model)
-            try request.set("skelpo-payload", to: payload)
+            try request.set(.payloadKey, to: payload)
             
             return model
         })
@@ -123,7 +129,7 @@ extension BasicJWTAuthenticatable {
                 
                 // Store the payload and the model in the request
                 // for later access.
-                try request.set("skelpo-payload", to: authenticated.0)
+                try request.set(.payloadKey, to: authenticated.0)
                 try request.authenticate(authenticated.1)
                 
                 return authenticated.1

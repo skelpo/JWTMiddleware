@@ -24,7 +24,7 @@ public final class JWTStorageMiddleware<Payload: JWTPayload>: Middleware {
         // Extract the token from the request. It is expected to
         // be in the `Authorization` header as a bearer: `Bearer ...`
         guard let token = request.http.headers.bearerAuthorization?.token else {
-            throw Abort(.badRequest, reason: "'Authorization' header with bearer token is missing")
+            throw Abort(.unauthorized, reason: "'Authorization' header with bearer token is missing")
         }
         
         // Get JWT service to verify the token with
@@ -33,7 +33,7 @@ public final class JWTStorageMiddleware<Payload: JWTPayload>: Middleware {
         
         // Verify to token and store the payload in the request's private container.
         let payload = try JWT<Payload>(from: data, verifiedUsing: jwt.signer).payload
-        try request.set("skelpo-payload", to: payload)
+        try request.set(.payloadKey, to: payload)
         
         // Fire the next responder in the chain.
         return try next.respond(to: request)
@@ -56,7 +56,7 @@ public final class JWTVerificationMiddleware: Middleware {
         // Extract the token from the request. It is expected to
         // be in the `Authorization` header as a bearer: `Bearer ...`
         guard let token = request.http.headers.bearerAuthorization?.token else {
-            throw Abort(.badRequest, reason: "'Authorization' header with bearer token is missing")
+            throw Abort(.unauthorized, reason: "'Authorization' header with bearer token is missing")
         }
         
         // Get JWT service to verify the token with
