@@ -1,21 +1,21 @@
-// swift-tools-version:4.0
+// swift-tools-version:5.1
 
 import PackageDescription
 
 let package = Package(
     name: "JWTMiddleware",
+    platforms: [
+       .macOS(.v10_15)
+    ],
     products: [
-        .library(name: "JWTMiddleware", targets: ["JWTMiddleware", "JWTAuthenticatable"]),
+        .library(name: "JWTMiddleware", targets: ["JWTMiddleware"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/skelpo/vapor-request-storage.git", from: "0.4.0"),
-        .package(url: "https://github.com/skelpo/JWTVapor.git", from: "0.13.0"),
-        .package(url: "https://github.com/vapor/vapor.git", from: "3.3.0"),
-        .package(url: "https://github.com/vapor/auth.git", from: "2.0.4")
+    .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0-beta.3"),
+    .package(url: "https://github.com/vapor/jwt.git", from: "4.0.0-beta.2"),
     ],
     targets: [
-        .target(name: "JWTAuthenticatable", dependencies: ["Vapor", "Authentication", "JWTVapor", "VaporRequestStorage"]),
-        .target(name: "JWTMiddleware", dependencies: ["Vapor", "Authentication", "JWTVapor", "JWTAuthenticatable"]),
+        .target(name: "JWTMiddleware", dependencies: ["Vapor", "JWT"]),
         .testTarget(name: "JWTMiddlewareTests", dependencies: ["JWTMiddleware"])
     ]
 )
