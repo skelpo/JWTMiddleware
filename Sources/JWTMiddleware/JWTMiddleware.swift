@@ -30,11 +30,9 @@ extension AnyHashable {
 
 extension Request {
     var loggedIn: Bool {
-        if (self.userInfo[.payload] as? JWTPayload) != nil {
-            return true
-        }
-        return false
+        return (self.userInfo[.payload] as? JWTPayload) != nil
     }
+    
     var payload: JWTPayload {
         get { self.userInfo[.payload] as! JWTPayload }
         set { self.userInfo[.payload] = newValue }
