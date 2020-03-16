@@ -1,10 +1,10 @@
 import Vapor
 import JWT
 
-final class JWTMiddleware<T: JWTPayload>: Middleware {
-    init() { }
+public final class JWTMiddleware<T: JWTPayload>: Middleware {
+    public init() {}
 
-    func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
+    public func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
         
         guard let token = request.headers.bearerAuthorization?.token.utf8 else {
             return request.eventLoop.makeFailedFuture(Abort(.unauthorized, reason: "Missing authorization bearer header"))
@@ -24,19 +24,13 @@ final class JWTMiddleware<T: JWTPayload>: Middleware {
 
 }
 
-extension AnyHashable {
-    static let payload: String = "jwt_payload"
-}
-
 extension Request {
-    var loggedIn: Bool {
-        if (self.userInfo[.payload] as? JWTPayload) != nil {
-            return true
-        }
-        return false
+    private struct PayloadKey: StorageKey {
+        typealias Value = JWTPayload
     }
+
     var payload: JWTPayload {
-        get { self.userInfo[.payload] as! JWTPayload }
-        set { self.userInfo[.payload] = newValue }
+        get { self.storage[PayloadKey.self]! }
+        set { self.storage[PayloadKey.self] = newValue }
     }
 }
