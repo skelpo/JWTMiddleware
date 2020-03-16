@@ -24,19 +24,13 @@ public final class JWTMiddleware<T: JWTPayload>: Middleware {
 
 }
 
-extension AnyHashable {
-    static let payload: String = "jwt_payload"
-}
-
 extension Request {
-    var loggedIn: Bool {
-        if (self.userInfo[.payload] as? JWTPayload) != nil {
-            return true
-        }
-        return false
+    private struct PayloadKey: StorageKey {
+        typealias Value = JWTPayload
     }
+
     var payload: JWTPayload {
-        get { self.userInfo[.payload] as! JWTPayload }
-        set { self.userInfo[.payload] = newValue }
+        get { self.storage[PayloadKey.self]! }
+        set { self.storage[PayloadKey.self] = newValue }
     }
 }
