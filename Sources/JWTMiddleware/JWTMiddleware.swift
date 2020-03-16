@@ -1,10 +1,10 @@
 import Vapor
 import JWT
 
-final class JWTMiddleware<T: JWTPayload>: Middleware {
-    init() { }
+public final class JWTMiddleware<T: JWTPayload>: Middleware {
+    public init() {}
 
-    func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
+    public func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
         
         guard let token = request.headers.bearerAuthorization?.token.utf8 else {
             return request.eventLoop.makeFailedFuture(Abort(.unauthorized, reason: "Missing authorization bearer header"))
